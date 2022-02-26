@@ -77,9 +77,7 @@ app.get('/blogs/:id', (req, res) => {
 
 app.delete('/blogs/:id', (req, res) => {
     const id = req.params.id;
-    // now we can use Blog models 
     Blog.findByIdAndDelete(id)
-        // this goes out to the database, it finds a document by the ID and deletes it from the database
         .then((result) => {
             res.json({ redirect: '/blogs' })
         })
