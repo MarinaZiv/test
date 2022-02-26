@@ -1,0 +1,72 @@
+<html lang="en">
+<%- include("../partials/head.ejs") %>
+
+    <body>
+        <%- include("../partials/nav.ejs") %>
+
+            <div class="details content">
+                <h2>
+                    <%= blog.title %>
+                </h2>
+                <div class="content">
+                    <p>
+                        <%= blog.body %>
+                    </p>
+                </div>
+                <a class="delete" data-doc="<%= blog._id %>">
+                    <img src="/trashcan.svg" alt="delete icon">
+                </a>
+            </div>
+
+
+            <%- include("../partials/footer.ejs") %>
+
+
+                <script>
+                    // Click on delete button sends a delete request to the server,
+                    // then we go out to the database from the server and delete the blog with that ID
+                    // we`re going to that in vanilla JS on the front-end, so important to notice that
+                    // this is not gonna be JS that is running on the server.
+                    // this is going to be running in the browser and when we click on this.
+                    // because in our view, if we add a script tag at the bottom, any script inside the script tag is going
+                    // to run in the browser, not on the server!!
+
+                    // we grab a reference first
+                    const trashcan = document.querySelector('a.delete');
+                    // adding the event listener
+                    trashcan.addEventListener('click', (e) => {
+                        // we gonna send a delete request to the server.
+                        // we store this request inside a constant so we can reference it later.
+                        // it`s equel to a template string, then we want to output a variable, the ID
+                        // which we can get from data-doc attribute by saying trash (which is our reference to that element).dataset.doc
+                        const endpoint = `/blogs/${trashcan.dataset.doc}`;  // ( /blogs/:id )
+
+                        // fetch() in its simplest definition, is a function in JavaScript for interacting with the database, 
+                        // especially with APIs (Application Programming Interface). 
+                        // These interactions include the fetching data, 
+                        // uploading data, editing data, and deleting data.
+                        fetch(endpoint, {
+                            // 1st argument- where we want to send a request (endpoint), then we passing the options object (type request)
+                            method: 'DELETE',
+                            // it sends out the request from JS to this endpoint with that (${trashcan.dataset.doc}) blog ID in it 
+                            // and it says that this is a delete request so when it gets to the server
+                            // then we know it`s a delete request we can handle it
+                        })
+                            // when the response sent to us (in hendeler) then we get that JSON back inside as response and
+                            // we`ll use a json() method on that, that return another promise whereby it passes this JSON data into 
+                            // an actual JS object which we gonna call 'data'
+                            .then(response => response.json())
+                            // then((data) => consol.log(data))
+                            // now we click on delete btn, it sends a request to the server, the server deletes that document based on the ID 
+                            // it sends JSON as a response in here ( .then(response => response.json())), we take that json and pass it into a JS object 
+                            // which we can use and we get access to that here (then(data =>)
+
+                            .then(data => window.location.href = data.redirect)
+                            // now we redirect it from the front. We take a WINDOW obj and say .location.href and we set it 
+                            // where we want to go --> data.redirect
+                            .catch(err => console.log(err));
+                    });
+                </script>
+    </body>
+
+</html>
