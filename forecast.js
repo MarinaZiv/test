@@ -21,6 +21,6 @@ const getCity = async (city) => {
     const response = await fetch(base + query);
     const data = await response.json();
     // console.log(data[3]);
-    return data[3];
+    return data[0];
 };
 
