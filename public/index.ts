@@ -1,71 +1,5 @@
 let axios;
 
-// interface Game {
-//   cards: Array<Card>;
-//   players: Array<Player>;
-// }
-
-// interface Player {
-//   name: string;
-//   password: any;
-//   totalRounds: number;
-//   totalFlip: number;
-//   timeStatist: number;
-//   playerID: string;
-// }
-
-// interface Card {
-//   url: string;
-//   cardID: number;
-// }
-
-// const game = {
-//   cards: [
-//     {
-//       url: "./img/1.jpg",
-//       cardID: 1,
-//     },
-//     {
-//       url: "./img/2.jpg",
-//       cardID: 2,
-//     },
-//     {
-//       url: "./img/3.jpg",
-//       cardID: 3,
-//     },
-//     {
-//       url: "./img/4.jpg",
-//       cardID: 4,
-//     },
-//     {
-//       url: "./img/5.jpg",
-//       cardID: 5,
-//     },
-//     {
-//       url: "./img/6.jpg",
-//       cardID: 6,
-//     },
-//     {
-//       url: "./img/7.jpg",
-//       cardID: 7,
-//     },
-//     {
-//       url: "./img/8.jpg",
-//       cardID: 8,
-//     },
-//   ],
-//   players: [
-//     {
-//       name: "Ryu",
-//       password: "123",
-//       totalRounds: 0,
-//       totalFlip: 0,
-//       timeStatist: 0,
-//       playerID: uid(),
-//     },
-//   ],
-// };
-
 const state = {
   matchedCards: [],
   cardsArray: [],
@@ -109,7 +43,6 @@ const loadNewGame = async function loadgame() {
   renderPlayer(lastLoggedInPlayer);
 };
 
-
 const loadPlayersList = async function loadgame() {
   const { players, lastLoggedInPlayer } = await getDeck();
   console.log(players, lastLoggedInPlayer);
@@ -121,15 +54,16 @@ function handleToRegisterForm() {
   const formLogin: any = document.querySelector(".name");
   const formRegister: any = document.querySelector(".register");
   const registerLink: any = document.querySelector(".register-link");
-  formLogin.style.display = "none";
+  const error: any = document.querySelector(".error");
   registerLink.style.display = "none";
+  formLogin.style.display = "none";
+  error.style.display = "none";
   formRegister.style.display = "block";
 }
 
 function renderDeck(pairedCardArray) {
   const root = document.querySelector("#root");
   let html = "";
-
   pairedCardArray.forEach((obj) => {
     html += `
         <div class="containerGame__card" onclick="handleFlipCard(event)" id="${obj.cardID}" >
@@ -141,7 +75,6 @@ function renderDeck(pairedCardArray) {
   root.innerHTML = html;
 }
 
-
 function renderPlayer(lastLoggedInPlayer) {
   const playerRoot = document.querySelector("#playerRoot");
   let html = "";
@@ -149,10 +82,8 @@ function renderPlayer(lastLoggedInPlayer) {
   playerRoot.innerHTML = html;
 };
 
-
 function renderPlayerList(players) {
   const playersList = document.querySelector("#playersListRoot");
-  // playersList.innerHTML += `<p class="generalStatistic-title" id="game-title">All players:</p>`;
   let playerhtml = "";
   players.forEach((player) => {
     playerhtml += `  
@@ -164,19 +95,16 @@ function renderPlayerList(players) {
 function renderGeneralStatistic(lastLoggedInPlayer) {
   const statisticRoot = document.querySelector("#statisticRoot");
   let html = "";
-
   html += `
             <h3 ${lastLoggedInPlayer.playerID}>Name&nbsp;: &nbsp;&nbsp;&nbsp;&nbsp; <span style="color:rgba(130, 29, 18, 0.691); letter-spacing: 2px; font-family: 'Russo One', sans-serif;  font-weight: bold; font-size: 1.6rem;">${lastLoggedInPlayer.name}</span></h3>
             <div class="generalStatistic__info-totalRounds">
                 <p>Total Rounds&nbsp;:</p>
                 <h1 style="color: rgba(130, 29, 18, 0.591); font-weight: bold;">${lastLoggedInPlayer.totalRounds}</h1>
             </div>
-
             <div class="generalStatistic__info-time" ${lastLoggedInPlayer.playerID}>
                 <p>Time&nbsp;: <span style="color: rgba(130, 29, 18, 0.691); font-weight: bold;"></span></p>
                 <h1 style="color: rgba(130, 29, 18, 0.691);font-weight: bold;">${lastLoggedInPlayer.timeStatist}</h1>
-            </div>
-           
+            </div>          
             <div class="generalStatistic__info-flips" ${lastLoggedInPlayer.playerID}>
                 <p>Flips&nbsp;:</p>
                 <h1 style="color: rgba(130, 29, 18, 0.691); font-weight: bold;">${lastLoggedInPlayer.totalFlip}</h1>
@@ -189,10 +117,10 @@ function renderGeneralStatistic(lastLoggedInPlayer) {
 async function getDeck() {
   try {
     const { data } = await axios.post("/get-deck");
-    const { pairedCardArray, players, lastLoggedInPlayer } = data;
-    
+    const { pairedCardArray, players, lastLoggedInPlayer } = data;    
     console.log("this is the deck data from the server:", data);
     return data;
+
   } catch (error) {
     console.error(error);
   }
@@ -205,13 +133,11 @@ async function handleRegester(e: any) {
     e.preventDefault();
     let { name, password } = e.target.elements;
     name = name.value;
-    password = password.value;
-    
+    password = password.value;    
     console.log(name, password);
 
     const { data } = await axios.post("/player-add", { name, password });
     const {players} = data;
-
     console.log(players);
     window.location.href = "./game.html";
     e.target.reset();
@@ -278,13 +204,12 @@ const handleFlipCard = (e: any, playerID: string) => {
   if(totalFlip) {
     const updatePlayerStatistic = async function (playerID: string) {
       const { data } = await axios.post("/player-statistic-update", { playerID, totalFlip});
-      const {players, error} = data;
+      const {players, error} = data;  // returns undefined
       if (error) throw new Error(error);
       console.log(players);
     }
     updatePlayerStatistic(playerID);
   }
-  
   
   if (state.clickNumber <= 2) {
     if (element.className === "containerGame__card") {
@@ -296,9 +221,7 @@ const handleFlipCard = (e: any, playerID: string) => {
 
         if (state.clickNumber === 2) {
           const checkMatch = async function () {
-            const { data } = await axios.get(
-              `/check-match?card1=${state.matchedCards[0].id}&card2=${state.matchedCards[1].id}`
-            );
+            const { data } = await axios.get(`/check-match?card1=${state.matchedCards[0].id}&card2=${state.matchedCards[1].id}`);
 
             if (data == true) {
               state.matchedCards[0].style.opacity = "0";
@@ -316,8 +239,6 @@ const handleFlipCard = (e: any, playerID: string) => {
     flipBackUnPairedCards();
     state.clickNumber = 0;
   }
-
-  winStateCheck();
   // console.dir(state.clickNumber);
   // console.dir(e.target.id);
   console.log(element.id);
@@ -331,7 +252,6 @@ const winStateCheck = () => {
     victory();
   }
 };
-
 
 function flipBackUnPairedCards() {
   const cards: any = document.querySelectorAll(".containerGame__card");
@@ -359,7 +279,9 @@ const victory = () => {
   victory.play();
   bgMusic.pause();
   hideCards();
-  winMessage();
+  if (state.matchedCards.length === state.cardsArray.length) {
+    victory();
+  }
 };
 
 function hideCards() {
@@ -525,6 +447,8 @@ function pulseStatistic() {
 function uid() {
   return Date.now().toString(36) + Math.random().toString(36).substr(2);
 };
+
+
 
 // async function handleUpdatePlayerName(e: any, newPlayerID: string) {
 //   try {
